@@ -183,6 +183,126 @@
   };
 
   # ════════════════════════════════════════════════
+  # VS CODE — via Home-Manager
+  # ════════════════════════════════════════════════
+  #
+  # Das Package selbst wird system-level installiert (vscode.fhs in configuration.nix)
+  # weil die FHS-Variante root braucht. Hier konfigurieren wir Settings + Extensions.
+  #
+  # Extensions installieren:
+  #   Option A: Einfach im VS Code Marketplace installieren (funktioniert dank FHS)
+  #   Option B: Deklarativ über extensions = [ ... ] (reproduzierbar, aber manueller)
+  #
+  # Für volle deklarative Extension-Verwaltung → nix-vscode-extensions Flake Input nutzen
+
+  programs.vscode = {
+    enable = true;
+    package = pkgs.vscode.fhs;   # FHS-kompatibel, Extensions funktionieren
+    # mutableExtensionsDir = true;  # true = Extensions auch manuell installierbar (default)
+
+    userSettings = {
+      # ── Editor ──
+      "editor.fontSize" = 14;
+      "editor.fontFamily" = "'JetBrains Mono NF', 'Fira Code', 'Droid Sans Mono', monospace";
+      "editor.fontLigatures" = true;
+      "editor.formatOnSave" = true;
+      "editor.minimap.enabled" = false;
+      "editor.renderWhitespace" = "boundary";
+      "editor.bracketPairColorization.enabled" = true;
+      "editor.smoothScrolling" = true;
+      "editor.cursorBlinking" = "smooth";
+      "editor.cursorSmoothCaretAnimation" = "on";
+      "editor.tabSize" = 4;
+      "editor.detectIndentation" = true;
+
+      # ── Terminal ──
+      "terminal.integrated.fontFamily" = "'JetBrains Mono NF'";
+      "terminal.integrated.fontSize" = 13;
+      "terminal.integrated.defaultProfile.linux" = "zsh";
+
+      # ── Files ──
+      "files.autoSave" = "afterDelay";
+      "files.autoSaveDelay" = 1000;
+      "files.trimTrailingWhitespace" = true;
+      "files.insertFinalNewline" = true;
+      "files.trimFinalNewlines" = true;
+
+      # ── Workbench ──
+      "workbench.colorTheme" = "Default Dark+";  # Anpassen nach Geschmack
+      "workbench.iconTheme" = "vs-seti";
+      "workbench.startupEditor" = "none";
+
+      # ── Telemetry aus ──
+      "telemetry.telemetryLevel" = "off";
+      "redhat.telemetry.enabled" = false;
+
+      # ── Wayland ──
+      # NIXOS_OZONE_WL=1 ist schon in sessionVariables gesetzt
+      "window.titleBarStyle" = "custom";
+
+      # ── Git ──
+      "git.autofetch" = true;
+      "git.confirmSync" = false;
+      "git.enableSmartCommit" = true;
+
+      # ── Rust ──
+      "rust-analyzer.check.command" = "clippy";
+
+      # ── C# / .NET ──
+      "dotnetAcquisitionExtension.existingDotnetPath" = [
+        {
+          "extensionId" = "ms-dotnettools.csharp";
+          "path" = "/run/current-system/sw/bin/dotnet";
+        }
+      ];
+
+      # ── Nix ──
+      "nix.enableLanguageServer" = true;
+      "nix.serverPath" = "nil";
+      "nix.serverSettings" = {
+        "nil" = {
+          "formatting" = {
+            "command" = [ "nixfmt" ];
+          };
+        };
+      };
+    };
+
+    # Deklarative Extensions — die wichtigsten vorinstalliert
+    # Weitere Extensions können trotzdem manuell im Marketplace installiert werden
+    extensions = with pkgs.vscode-extensions; [
+      # Nix
+      jnoortheen.nix-ide
+
+      # Rust
+      rust-lang.rust-analyzer
+
+      # C# / .NET
+      ms-dotnettools.csharp
+      ms-dotnettools.csdevkit
+
+      # Python
+      ms-python.python
+      ms-python.debugpy
+
+      # Docker
+      ms-azuretools.vscode-docker
+
+      # Git
+      eamodio.gitlens
+
+      # Remote
+      ms-vscode-remote.remote-ssh
+
+      # Allgemein
+      esbenp.prettier-vscode
+      dbaeumer.vscode-eslint
+      usernamehw.errorlens
+      pkief.material-icon-theme
+    ];
+  };
+
+  # ════════════════════════════════════════════════
   # FZF
   # ════════════════════════════════════════════════
 
@@ -285,5 +405,7 @@
     dust               # Modernes du
     procs              # Modernes ps
     bottom             # Noch ein System Monitor
+    nil                # Nix Language Server (für VS Code nix-ide)
+    nixfmt-rfc-style   # Nix Formatter (für VS Code nix-ide)
   ];
 }

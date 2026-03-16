@@ -265,6 +265,56 @@
   };
 
   # ════════════════════════════════════════════════
+  # LOGITECH
+  # ════════════════════════════════════════════════
+  #
+  # Solaar:     Unifying / Bolt / Lightspeed Receiver Management
+  #             Batteriestatus, Pairing, DPI (für Wireless)
+  # Piper:      Gaming Maus Konfiguration (DPI, Buttons, Profile)
+  #             Nutzt libratbag als Backend (D-Bus Daemon)
+  # logiops:    Low-Level HID++ Daemon (Alternative für Power-User)
+
+  # Logitech Unifying Receiver udev Rules
+  hardware.logitech.wireless = {
+    enable = true;              # udev Rules + Solaar
+    enableGraphical = true;     # Solaar GUI
+  };
+
+  # libratbag — D-Bus Daemon für Gaming Mäuse (Backend für Piper)
+  # Unterstützt: G Pro, G502, G903, G305, MX Master, etc.
+  services.ratbagd.enable = true;
+
+  # ════════════════════════════════════════════════
+  # FAN CONTROL — CoolerControl
+  # ════════════════════════════════════════════════
+  #
+  # GUI-basiertes Fan Control Tool
+  # Unterstützt: CPU Fans, Case Fans, GPU Fans (NVIDIA)
+  # Web UI auf http://localhost:11987
+  # nvidiaSupport Option wurde in 25.11 entfernt — Treiber werden
+  # jetzt automatisch zur Laufzeit geladen.
+
+  programs.coolercontrol.enable = true;
+
+  # Alternativ: klassisches lm-sensors fancontrol (CLI, kein GUI)
+  # Dafür: sudo pwmconfig laufen lassen → Config generieren → hier eintragen
+  # hardware.fancontrol = {
+  #   enable = true;
+  #   config = ''
+  #     # Von pwmconfig generiert — Platzhalter!
+  #     INTERVAL=10
+  #     DEVPATH=...
+  #     DEVNAME=...
+  #     FCTEMPS=...
+  #     FCFANS=...
+  #     MINTEMP=...
+  #     MAXTEMP=...
+  #     MINSTART=...
+  #     MINSTOP=...
+  #   '';
+  # };
+
+  # ════════════════════════════════════════════════
   # SERVICES
   # ════════════════════════════════════════════════
 
@@ -425,6 +475,16 @@
     mangohud                              # CLI + Overlay (Config via Home-Manager)
     goverlay                              # MangoHud Config GUI
     nvidia-vaapi-driver                   # VA-API via NVIDIA (Achtung: kann mit open=true buggen)
+
+    # ── Logitech ──
+    # Solaar wird über hardware.logitech.wireless installiert (oben)
+    piper                                 # Gaming Maus Config GUI (nutzt libratbag/ratbagd)
+
+    # ── Editoren / IDE ──
+    # VS Code als FHS-kompatibles Package — Extensions mit pre-compiled Binaries
+    # (Rust Analyzer, C/C++, Python, etc.) funktionieren out-of-the-box.
+    # Für die reine/deklarative Variante → Home-Manager programs.vscode nutzen.
+    vscode.fhs                            # VS Code mit FHS Compat Layer
 
     # ── Media / Desktop ──
     firefox
